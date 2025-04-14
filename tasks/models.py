@@ -25,8 +25,8 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
       
-    email = models.EmailField(max_length=30)
-    number = models.IntegerField()
+    email = models.EmailField(max_length=30, unique=True)
+    mobile = models.IntegerField()
     name = models.CharField(max_length= 30)
     is_active = models.BooleanField(default= True)
     is_staff =  models.BooleanField(default=True)
@@ -50,13 +50,15 @@ class Task(models.Model):
     
     name = models.CharField(max_length=255)
     description = models.TextField()
-    craeted_at = models.DateTimeField(auto_now_add=True)
+    deadline = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     task_type = models.CharField(max_length=50, blank=True)
     completed_at = models.DateTimeField(null=True, blank= True)
     status = models.CharField(max_length= 30 , choices= STATUS_CHOICES , default= "pending")
     assigned_users = models.ManyToManyField(User, related_name= "tasks")
     
 
-
+    def __str__(self):
+        return self.name
 
 
