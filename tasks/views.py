@@ -2,8 +2,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
-from .models import Task
+from .models import Task , User
 from .serializers import TaskSerialzier
+from rest_framework.generics import CreateAPIView
+from rest_framework import status
+from rest_framework.generics import RetrieveAPIView
 
 
 class TaskListAPIView(APIView):
@@ -38,3 +41,35 @@ class TaskListAPIView(APIView):
 
         serializer = TaskSerialzier(tasks.distinct(), many=True)
         return Response(serializer.data)
+
+
+
+
+class TaskCreateAPIView(CreateAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerialzier
+    permission_classes = [IsAuthenticated]
+
+
+
+class TaskDetailAPIView(RetrieveAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerialzier
+    permission_classes = [IsAuthenticated]
+
+
+
+class AssignTaskAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+
+    def post(self, request, task_id):
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
+            return Response({"error": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        user_ids = request.data.get("user_ids",[])
+        users = User.objects.filter(id__in=user_ids)
+        task.assigned_users.set(users)
+        return Response({"message":"Users assigned successfully"})
