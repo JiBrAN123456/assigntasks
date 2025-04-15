@@ -1,0 +1,88 @@
+ step-by-step guide to test your Task Management APIs with JWT auth using Postman:
+
+✅ 1. Get JWT Token (Login)
+Endpoint: POST http://localhost:8000/api/token/
+Body (raw JSON):
+
+json
+Copy
+Edit
+{
+  "email": "your_user_email@example.com",
+  "password": "your_password"
+}
+Response:
+
+json
+Copy
+Edit
+{
+  "refresh": "your_refresh_token",
+  "access": "your_access_token"
+}
+🔑 Save the access token, you’ll need it for the next steps.
+
+✅ 2. Set Authorization Header
+In Postman, click on Authorization tab → Type: Bearer Token
+Paste your access token there.
+
+Or manually set header:
+
+makefile
+Copy
+Edit
+Authorization: Bearer your_access_token
+✅ 3. Create a Task
+Endpoint: POST http://localhost:8000/api/tasks/create/
+Headers:
+Authorization: Bearer <access_token>
+Body (JSON):
+
+json
+Copy
+Edit
+{
+  "name": "Design UI",
+  "description": "Work on the dashboard layout",
+  "task_type": "feature",
+  "status": "pending",
+  "assigned_user_ids": [1],  // change to valid user IDs in DB
+  "deadline": "2025-04-20 23:59:59"
+}
+✅ 4. List Tasks
+Endpoint: GET http://localhost:8000/api/tasks/
+With optional filters like:
+
+?status=pending
+
+?assigned_user=1
+
+?deadline_before=2025-04-20
+
+?is_pending=true
+
+✅ 5. Get Task Details
+Endpoint: GET http://localhost:8000/api/tasks/<task_id>/
+Example:
+GET http://localhost:8000/api/tasks/1/
+
+✅ 6. Assign Users to a Task
+Endpoint: POST http://localhost:8000/api/tasks/1/assign/
+Body:
+
+json
+Copy
+Edit
+{
+  "user_ids": [2, 3]
+}
+✅ 7. Refresh Access Token
+Endpoint: POST http://localhost:8000/api/token/refresh/
+Body:
+
+json
+Copy
+Edit
+{
+  "refresh": "your_refresh_token"
+}
